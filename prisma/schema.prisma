@@ -1,0 +1,233 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  username  String   @id @map("username")
+  password  String   @map("password")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("admins")
+}
+
+model Student {
+  nisn           String   @id @map("nisn")
+  registrationId String   @map("registration_id")
+  name           String   @map("name")
+  placeOfBirth   String   @map("place_of_birth")
+  birthDate      DateTime @map("birth_date") @db.Date
+  address        String?  @map("address")
+  motherName     String   @map("mother_name")
+  fatherName     String?  @map("father_name")
+  gender         Gender   @default(Laki_laki) @map("gender")
+  email          String?  @map("email")
+  dateOfEntry    DateTime @map("date_of_entry") @db.Date
+  status         Status   @default(Siswa_Baru) @map("status")
+  isActive       Boolean  @default(true) @map("is_active")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @default(now()) @updatedAt @map("updated_at")
+
+  StudentsPass          StudentsPass[]
+  Alumni                Alumni[]
+  ClassroomList         ClassroomMember[]
+  ExtracurricularMember ExtracurricularMember[]
+
+  @@unique([registrationId])
+  @@map("students")
+}
+
+model Teacher {
+  id           String   @id @map("id")
+  name         String   @map("name")
+  placeOfBirth String   @map("place_of_birth")
+  birthDate    DateTime @map("birth_date") @db.Date
+  address      String?  @map("address")
+  nik          String?  @map("nik")
+  nuptk        String?  @map("nuptk")
+  nip          String?  @map("nip")
+  email        String?  @map("email")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+
+  Classroom       Classroom[]
+  Learning        Learning[]
+  LessonSchedule  LessonSchedule[]
+  extracurricular Extracurricular[]
+
+  @@unique([nuptk])
+  @@map("teachers")
+}
+
+model Classroom {
+  id            String   @id @map("id")
+  name          String   @map("name")
+  homeroom      String   @map("homeroom")
+  program       Program  @default(IPA) @map("program")
+  schoolYear    String   @map("school_year")
+  totalStudents Int?     @map("total_students")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+
+  Teacher        Teacher          @relation(fields: [homeroom], references: [id])
+  Learning       Learning[]
+  LessonSchedule LessonSchedule[]
+
+  @@map("classrooms")
+}
+
+model ClassroomMember {
+  classroomId String   @id @map("classroom_id")
+  nisn        String   @map("nisn")
+  studentName String   @map("student_name")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  Student Student @relation(fields: [nisn], references: [nisn])
+
+  @@map("classroom_members")
+}
+
+model Learning {
+  id                     String    @id @map("id")
+  name                   String    @map("name")
+  teacherId              String    @map("teacher_id")
+  classroomId            String    @map("classromm_id")
+  numberOfHours          Int       @default(0) @map("number_of_hours")
+  assignmentDecreeNumber String?   @map("assignment_decree_number")
+  assignmentDate         DateTime? @map("assignment_date") @db.Date
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  Classroom      Classroom        @relation(fields: [classroomId], references: [id])
+  Teacher        Teacher          @relation(fields: [teacherId], references: [id])
+  LessonSchedule LessonSchedule[]
+
+  @@map("learnings")
+}
+
+model LessonSchedule {
+  id            String   @id @map("id")
+  classroomId   String   @map("classroom_id")
+  day           String   @map("day")
+  clockOrder    Int      @map("clock_order")
+  startTeaching DateTime @map("start_teaching") @db.Time()
+  endTeaching   DateTime @map("end_teaching") @db.Time()
+  learningId    String   @map("learning_id")
+  teacherId     String   @map("teacher_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+
+  Classroom Classroom @relation(fields: [classroomId], references: [id])
+  Learning  Learning  @relation(fields: [learningId], references: [id])
+  Teacher   Teacher   @relation(fields: [teacherId], references: [id])
+
+  @@map("lesson_Schedules")
+}
+
+model StudentsPass {
+  id            Int           @id @default(autoincrement())
+  studentId     String        @map("student_id")
+  studentName   String        @map("student_name")
+  outDate       DateTime      @map("out_date") @db.Date
+  reasonToLeave ReasonToLeave @default(Lulus) @map("reason_to_leave")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @default(now()) @updatedAt @map("updated_at")
+
+  Student Student @relation(fields: [studentId], references: [nisn])
+
+  @@unique([studentId])
+  @@map("students_pass")
+}
+
+model Alumni {
+  id             Int       @id @default(autoincrement())
+  studentId      String    @map("student_id")
+  studentName    String    @map("student_name")
+  gender         Gender    @default(Laki_laki) @map("gender")
+  placeOfBirth   String?   @map("place_of_birth")
+  birthDate      DateTime? @map("birth_date") @db.Date
+  address        String?   @map("address")
+  noHp           String?   @map("number_handphone")
+  email          String?   @map("email")
+  profession     String?   @map("profession")
+  motherName     String?   @map("mother_name")
+  classYear      String    @map("class_year")
+  graduationYear String    @map("graduation_year")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  Student Student @relation(fields: [studentId], references: [nisn])
+
+  @@unique([studentId])
+  @@map("alumnis")
+}
+
+model Extracurricular {
+  id          String   @id @map("id")
+  name        String   @map("name")
+  mentor      String   @map("mentor")
+  practiceDay String?  @map("practice_day")
+  place       String?  @map("place")
+  schoolYear  String   @map("school_year")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  Teacher Teacher @relation(fields: [mentor], references: [id])
+
+  @@map("extracurriculars")
+}
+
+model ExtracurricularMember {
+  extracurricularId String   @id @map("extracurricular_id")
+  nisn              String   @map("nisn")
+  studentName       String   @map("student_name")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @default(now()) @updatedAt @map("updated_at")
+
+  Student Student @relation(fields: [nisn], references: [nisn])
+
+  @@map("extracurricular_members")
+}
+
+model SchoolCode {
+  headerCode String   @id @map("header_code")
+  name       String   @map("name")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("school_code")
+}
+
+enum Gender {
+  Laki_laki
+  Perempuan
+}
+
+enum Status {
+  Siswa_Baru
+  Pindahan
+}
+
+enum Program {
+  IPA
+  IPS
+  BAHASA
+}
+
+enum ReasonToLeave {
+  Lulus
+  Tidak_Lulus
+  Drop_Out
+  Berhenti_Sekolah
+  Pindah_Sekolah
+  Lainnya
+}
