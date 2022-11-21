@@ -20,21 +20,22 @@ model Admin {
 }
 
 model Student {
-  nisn           String   @id @map("nisn")
-  registrationId String   @map("registration_id")
-  name           String   @map("name")
-  placeOfBirth   String   @map("place_of_birth")
-  birthDate      DateTime @map("birth_date") @db.Date
-  address        String?  @map("address")
-  motherName     String   @map("mother_name")
-  fatherName     String?  @map("father_name")
-  gender         Gender   @default(Laki_laki) @map("gender")
-  email          String?  @map("email")
-  dateOfEntry    DateTime @map("date_of_entry") @db.Date
-  status         Status   @default(Siswa_Baru) @map("status")
-  isActive       Boolean  @default(true) @map("is_active")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @default(now()) @updatedAt @map("updated_at")
+  nisn           String        @id @map("nisn")
+  registrationId String        @map("registration_id")
+  name           String        @map("name")
+  gender         Gender        @default(Laki_laki) @map("gender")
+  placeOfBirth   String        @map("place_of_birth")
+  birthDate      DateTime      @map("birth_date") @db.Date
+  address        String?       @map("address")
+  motherName     String        @map("mother_name")
+  fatherName     String?       @map("father_name")
+  email          String?       @map("email")
+  dateOfEntry    DateTime      @map("date_of_entry") @db.Date
+  status         StudentStatus @default(Siswa_Baru) @map("status")
+  studentFile    String?       @map("file")
+  studentUrl     String?       @map("url")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @default(now()) @updatedAt @map("updated_at")
 
   StudentsPass          StudentsPass[]
   Alumni                Alumni[]
@@ -46,17 +47,21 @@ model Student {
 }
 
 model Teacher {
-  id           String   @id @map("id")
-  name         String   @map("name")
-  placeOfBirth String   @map("place_of_birth")
-  birthDate    DateTime @map("birth_date") @db.Date
-  address      String?  @map("address")
-  nik          String?  @map("nik")
-  nuptk        String?  @map("nuptk")
-  nip          String?  @map("nip")
-  email        String?  @map("email")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+  id           String        @id @map("id")
+  name         String        @map("name")
+  gender       Gender        @default(Laki_laki) @map("gender")
+  placeOfBirth String        @map("place_of_birth")
+  birthDate    DateTime      @map("birth_date") @db.Date
+  address      String?       @map("address")
+  nik          String?       @map("nik")
+  nuptk        String?       @map("nuptk")
+  nip          String?       @map("nip")
+  email        String?       @map("email")
+  status       TeacherStatus @default(Aktif) @map("status")
+  teacherFile  String?       @map("file")
+  teacherUrl   String?       @map("url")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @default(now()) @updatedAt @map("updated_at")
 
   Classroom       Classroom[]
   Learning        Learning[]
@@ -212,9 +217,19 @@ enum Gender {
   Perempuan
 }
 
-enum Status {
+enum StudentStatus {
   Siswa_Baru
   Pindahan
+  Lulus
+  Tidak_Lulus
+  Berhenti
+}
+
+enum TeacherStatus {
+  Aktif
+  Cuti
+  Mutasi
+  Berhenti
 }
 
 enum Program {

@@ -2,8 +2,8 @@ import express from "express";
 import cors from "cors";
 import { StudentRoute } from "@/routes/Student.route";
 import { Routes } from "./interfaces";
-// import dotenv from "dotenv";
-// dotenv.config();
+import dotenv from "dotenv";
+dotenv.config();
 
 const studentRoute = [new StudentRoute()];
 export class App {
