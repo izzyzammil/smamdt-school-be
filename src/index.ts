@@ -1,8 +1,10 @@
+import "reflect-metadata";
 import express from "express";
 import cors from "cors";
 import { StudentRoute } from "@/routes/Student.route";
 import { Routes } from "./interfaces";
 import dotenv from "dotenv";
+import errorMiddleware from "./middlewares/error.middleware";
 dotenv.config();
 
 const studentRoute = [new StudentRoute()];
@@ -13,6 +15,7 @@ export class App {
     this.app = express();
     this.initializeMiddlewares();
     this.initializeRoutes(routes);
+    this.initializeErrorHandling();
   }
 
   public server = () => {
@@ -22,8 +25,9 @@ export class App {
   };
 
   private initializeMiddlewares = () => {
-    this.app.use(cors());
+    this.app.use(cors({ origin: true, credentials: process.env.CREDENTIALS === "true" }));
     this.app.use(express.json());
+    this.app.use(express.urlencoded({ extended: true }));
   };
 
   private initializeRoutes = (routes: Routes[]) => {
@@ -31,6 +35,10 @@ export class App {
       this.app.use("/", route.router);
     });
   };
+
+  private initializeErrorHandling() {
+    this.app.use(errorMiddleware);
+  }
 }
 
 const app = new App([...studentRoute]);

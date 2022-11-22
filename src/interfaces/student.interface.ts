@@ -1,4 +1,4 @@
-import { Gender, Status } from "@prisma/client";
+import { Gender, StudentStatus } from "@prisma/client";
 
 export interface StudentArgs {
   name: string;
@@ -10,7 +10,7 @@ export interface StudentArgs {
   gender: Gender;
   email: string;
   dateOfEntry: Date;
-  status: Status;
+  status: StudentStatus;
 }
 
 export interface CreateStudentArgs extends StudentArgs {

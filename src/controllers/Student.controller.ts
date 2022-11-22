@@ -1,4 +1,4 @@
-import { CreateStudentArgs, UpdateStudentArgs } from "@/interfaces";
+import { CreateStudentDto, UpdateStudentDto } from "@/dtos/student.dto";
 import { StudentService } from "@/services";
 import { Response, NextFunction, Request } from "express";
 
@@ -28,7 +28,7 @@ export class StudentController {
 
   public createStudent = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const args: CreateStudentArgs = req.body;
+      const args: CreateStudentDto = req.body;
       const result = await this.studentService.createStudent(args);
 
       res.status(201).json({ message: "Success Create Student", data: result });
@@ -40,7 +40,7 @@ export class StudentController {
   public updateStudent = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { nisn } = req.params;
-      const args: UpdateStudentArgs = req.body;
+      const args: UpdateStudentDto = req.body;
       const result = await this.studentService.updateStudent(nisn, args);
 
       res.status(200).json({ message: "Success Update Student", data: result });
