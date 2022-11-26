@@ -3,8 +3,8 @@ import express from "express";
 import cors from "cors";
 import { StudentRoute } from "@/routes/Student.route";
 import { Routes } from "./interfaces";
+import { errorMiddleware } from "./middlewares";
 import dotenv from "dotenv";
-import errorMiddleware from "./middlewares/error.middleware";
 dotenv.config();
 
 const studentRoute = [new StudentRoute()];

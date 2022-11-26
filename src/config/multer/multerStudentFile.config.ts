@@ -1,15 +1,13 @@
 import { HttpException } from "@/exceptions/HttpException";
-import { RequestWithMember } from "@/interfaces";
-import { prisma } from "@/libs";
 import { diskStorage, Options } from "multer";
 import { extname } from "path";
 import fs from "fs";
+import { Request } from "express";
 
-export const multerRegisterMemberConfig = {
+export const multerStudentConfig = {
   storage: diskStorage({
-    destination: (req: RequestWithMember, file, callback) => {
-      const memberId = req.member.id;
-      const dir = "./uploads/registrasi-anggota/" + memberId;
+    destination: (req: Request, file, callback) => {
+      const dir = "./uploads/students";
 
       if (!fs.existsSync(dir)) {
         try {
@@ -21,33 +19,20 @@ export const multerRegisterMemberConfig = {
 
       callback(null, dir);
     },
-    filename: (req: RequestWithMember, file, callback) => {
-      const memberId = req.member.id;
-      const now = new Date().getTime();
+    filename: (req: Request, file, callback) => {
       const randomName = Array(16)
         .fill(null)
         .map(() => Math.round(Math.random() * 16).toString(16))
         .join("");
 
-      callback(null, `${memberId}_${now}_${randomName}${extname(file.originalname)}`);
+      callback(null, `${randomName}${extname(file.originalname)}`);
     },
   }),
 
-  limits: {
-    fileSize: 2 * 1024 * 1024,
-  },
+  limits: { fileSize: 2 * 1024 * 1024 },
 
-  fileFilter: async (req: RequestWithMember, file, callback) => {
-    const memberId = req.member.id;
-    const member = await prisma.member.findUnique({
-      where: { id: memberId },
-    });
-
-    if (!member) return callback(new HttpException(400, "Member not found"));
-
-    if (member.verifiedTimestamp) return callback(new HttpException(400, "Member has beend verified"));
-
-    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) return new HttpException(400, "Only image files are allowed!");
+  fileFilter: async (req: Request, file, callback) => {
+    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) return new HttpException(400, "Hanya file gambar yang diizinkan!");
 
     callback(null, true);
   },

@@ -1,5 +1,5 @@
 import { Gender, StudentStatus } from "@prisma/client";
-import { IsEnum, IsNotEmpty, IsOptional, IsString, Length } from "class-validator";
+import { IsEnum, IsNotEmpty, IsNumberString, IsOptional, IsString, Length, Min, MinLength } from "class-validator";
 
 export class StudentDto {
   @IsNotEmpty({ message: "Nama tidak boleh kosong" })
@@ -35,16 +35,17 @@ export class StudentDto {
   @IsEnum(StudentStatus, { message: "Status invalid" })
   status!: StudentStatus;
 
-  @IsOptional()
-  studentFile?: string;
+  // @IsOptional()
+  // studentFile?: string;
 
-  @IsOptional()
-  studentUrl?: string;
+  // @IsOptional()
+  // studentUrl?: string;
 }
 
 export class CreateStudentDto extends StudentDto {
   @IsNotEmpty({ message: "Nisn tidak boleh kosong" })
-  @Length(10, 10, { message: "Token harus 10 digit" })
+  @IsNumberString("", { message: "Nisn harus angka" })
+  @MinLength(10, { message: "Nisn harus 10 digit" })
   nisn!: string;
 
   @IsNotEmpty({ message: "No Induk tidak boleh kosong" })
