@@ -6,7 +6,11 @@ import path from "path";
 export class StudentController {
   public studentService = new StudentService();
 
-  public getStudent = async (req: Request, res: Response, next: NextFunction) => {
+  public getStudent = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const result = await this.studentService.getStudent();
 
@@ -16,18 +20,28 @@ export class StudentController {
     }
   };
 
-  public getStudentById = async (req: Request, res: Response, next: NextFunction) => {
+  public getStudentById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const { nisn } = req.params;
       const result = await this.studentService.getStudentById(nisn);
 
-      res.status(200).json({ message: "Success Get Student by NISN", data: result });
+      res
+        .status(200)
+        .json({ message: "Success Get Student by NISN", data: result });
     } catch (error) {
       next(error);
     }
   };
 
-  public createStudent = async (req: Request, res: Response, next: NextFunction) => {
+  public createStudent = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const args: CreateStudentDto = req.body;
 
@@ -38,7 +52,11 @@ export class StudentController {
     }
   };
 
-  public updateStudent = async (req: Request, res: Response, next: NextFunction) => {
+  public updateStudent = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const { nisn } = req.params;
       const args: UpdateStudentDto = req.body;
@@ -50,7 +68,11 @@ export class StudentController {
     }
   };
 
-  public deleteStudent = async (req: Request, res: Response, next: NextFunction) => {
+  public deleteStudent = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const { nisn } = req.params;
       const result = await this.studentService.deleteStudent(nisn);
@@ -61,7 +83,11 @@ export class StudentController {
     }
   };
 
-  public getStudentFile = async (req: Request, res: Response, next: NextFunction) => {
+  public getStudentFile = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const { fileName } = req.params;
 
