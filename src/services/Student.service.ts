@@ -1,5 +1,6 @@
 import { API_URL } from "@/config";
 import { CreateStudentDto, UpdateStudentDto } from "@/dtos";
+import { HttpException } from "@/exceptions/HttpException";
 import { prisma } from "@/libs/prisma";
 
 export class StudentService {
@@ -18,6 +19,18 @@ export class StudentService {
   };
 
   public createStudent = async (args: CreateStudentDto, file?: any) => {
+    const checkNisn = await prisma.student.findFirst({
+      where: { nisn: args.nisn },
+      select: { nisn: true },
+    });
+    if (checkNisn) throw new HttpException(400, "Something Wrong", { nisn: ["Nisn sudah dipakai"] });
+
+    const checkRegId = await prisma.student.findFirst({
+      where: { registrationId: args.registrationId, nisn: { not: args.nisn } },
+      select: { nisn: true },
+    });
+    if (checkRegId) throw new HttpException(400, "Something Wrong", { registrationId: ["Nomor Induk sudah dipakai"] });
+
     const filePath = file?.path ? file.path : null;
     const fileName = file?.filename ? `${API_URL}/student-file/${file.filename}` : null;
     const { birthDate, dateOfEntry, ...studentArgs } = args;
