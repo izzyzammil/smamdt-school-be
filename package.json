@@ -5,7 +5,9 @@
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prisma:migrate": "prisma migrate dev"
+    "prisma:migrate": "prisma migrate dev",
+    "----- script for run backend -------": "",
+    "dev": "nodemon"
   },
   "prisma": {
     "schema": "src/prisma/schema.prisma"
