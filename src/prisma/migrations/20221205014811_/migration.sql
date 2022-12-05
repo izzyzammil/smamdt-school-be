@@ -13,10 +13,24 @@ CREATE TYPE "Program" AS ENUM ('IPA', 'IPS', 'BAHASA');
 -- CreateEnum
 CREATE TYPE "ReasonToLeave" AS ENUM ('Lulus', 'Tidak_Lulus', 'Drop_Out', 'Berhenti_Sekolah', 'Pindah_Sekolah', 'Lainnya');
 
+-- CreateEnum
+CREATE TYPE "Roles" AS ENUM ('Admin', 'Student', 'Teacher');
+
 -- CreateTable
-CREATE TABLE "admins" (
+CREATE TABLE "users" (
+    "id" TEXT NOT NULL,
     "username" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    "role" "Roles" NOT NULL,
+
+    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "admins" (
+    "username" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -26,6 +40,7 @@ CREATE TABLE "admins" (
 -- CreateTable
 CREATE TABLE "students" (
     "nisn" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
     "registration_id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "gender" "Gender" NOT NULL DEFAULT 'Laki_laki',
@@ -49,6 +64,7 @@ CREATE TABLE "students" (
 CREATE TABLE "teachers" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
     "gender" "Gender" NOT NULL DEFAULT 'Laki_laki',
     "place_of_birth" TEXT NOT NULL,
     "birth_date" DATE NOT NULL,
@@ -202,6 +218,15 @@ CREATE UNIQUE INDEX "students_pass_student_id_key" ON "students_pass"("student_i
 
 -- CreateIndex
 CREATE UNIQUE INDEX "alumnis_student_id_key" ON "alumnis"("student_id");
+
+-- AddForeignKey
+ALTER TABLE "admins" ADD CONSTRAINT "admins_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "students" ADD CONSTRAINT "students_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "teachers" ADD CONSTRAINT "teachers_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "classrooms" ADD CONSTRAINT "classrooms_homeroom_fkey" FOREIGN KEY ("homeroom") REFERENCES "teachers"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

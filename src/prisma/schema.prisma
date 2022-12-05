@@ -10,17 +10,33 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id       String    @id @map("id")
+  username String    @map("username")
+  password String    @map("password")
+  role     Roles     @map("role")
+  Admin    Admin[]
+  Student  Student[]
+  Teacher  Teacher[]
+
+  @@map("users")
+}
+
 model Admin {
-  username  String   @id @map("username")
-  password  String   @map("password")
+  id        Int      @id @default(autoincrement()) @map("username")
+  name      String   @map("name")
+  userId    String   @map("userId")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  User User @relation(fields: [userId], references: [id])
 
   @@map("admins")
 }
 
 model Student {
   nisn           String        @id @map("nisn")
+  userId         String        @map("userId")
   registrationId String        @map("registration_id")
   name           String        @map("name")
   gender         Gender        @default(Laki_laki) @map("gender")
@@ -42,6 +58,8 @@ model Student {
   ClassroomList         ClassroomMember[]
   ExtracurricularMember ExtracurricularMember[]
 
+  User User @relation(fields: [userId], references: [id])
+
   @@unique([registrationId])
   @@map("students")
 }
@@ -49,6 +67,7 @@ model Student {
 model Teacher {
   id           String        @id @map("id")
   name         String        @map("name")
+  userId       String        @map("userId")
   gender       Gender        @default(Laki_laki) @map("gender")
   placeOfBirth String        @map("place_of_birth")
   birthDate    DateTime      @map("birth_date") @db.Date
@@ -67,6 +86,8 @@ model Teacher {
   Learning        Learning[]
   LessonSchedule  LessonSchedule[]
   extracurricular Extracurricular[]
+
+  User User @relation(fields: [userId], references: [id])
 
   @@unique([nuptk])
   @@map("teachers")
@@ -245,4 +266,10 @@ enum ReasonToLeave {
   Berhenti_Sekolah
   Pindah_Sekolah
   Lainnya
+}
+
+enum Roles {
+  Admin
+  Student
+  Teacher
 }

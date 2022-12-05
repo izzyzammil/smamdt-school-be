@@ -18,9 +18,21 @@ export class StudentRoute implements Routes {
   private initializeRoutes() {
     this.router.get("/students", this.studentController.getStudent);
     this.router.get("/students/:nisn", this.studentController.getStudentById);
-    this.router.post("/students", this.uploadStudentFile, validationMiddleware(CreateStudentDto, "body"), this.studentController.createStudent);
-    this.router.put("/students/:nisn", validationMiddleware(UpdateStudentDto, "body"), this.studentController.updateStudent);
+    this.router.post(
+      "/students",
+      this.uploadStudentFile,
+      validationMiddleware(CreateStudentDto, "body"),
+      this.studentController.createStudent
+    );
+    this.router.put(
+      "/students/:nisn",
+      validationMiddleware(UpdateStudentDto, "body"),
+      this.studentController.updateStudent
+    );
     this.router.delete("/students/:nisn", this.studentController.deleteStudent);
-    this.router.get("/student-file/:fileName", this.studentController.getStudentFile);
+    this.router.get(
+      "/student-file/:fileName",
+      this.studentController.getStudentFile
+    );
   }
 }
