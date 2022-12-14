@@ -11,13 +11,16 @@ datasource db {
 }
 
 model User {
-  id       String    @id @map("id")
-  username String    @map("username")
-  password String    @map("password")
-  role     Roles     @map("role")
-  Admin    Admin[]
-  Student  Student[]
-  Teacher  Teacher[]
+  id        String   @id @map("id")
+  username  String   @map("username")
+  password  String   @map("password")
+  role      Roles    @map("role")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  Admin   Admin[]
+  Student Student[]
+  Teacher Teacher[]
 
   @@map("users")
 }
@@ -225,10 +228,12 @@ model ExtracurricularMember {
 }
 
 model SchoolCode {
-  headerCode String   @id @map("header_code")
-  name       String   @map("name")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
+  headerCode    String   @id @map("header_code")
+  name          String   @map("name")
+  counterLength Int      @default(1) @map("counter_length")
+  nextCounter   Int      @map("next_counter")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("school_code")
 }

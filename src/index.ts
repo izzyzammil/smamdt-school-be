@@ -5,9 +5,11 @@ import { StudentRoute } from "@/routes/Student.route";
 import { Routes } from "./interfaces";
 import { errorMiddleware } from "./middlewares";
 import dotenv from "dotenv";
+import { SchoolCodeRoute } from "./routes/SchoolCode.route";
 dotenv.config();
 
 const studentRoute = [new StudentRoute()];
+const schoolCodeRoute = [new SchoolCodeRoute()];
 export class App {
   public app: express.Application;
 
@@ -20,7 +22,7 @@ export class App {
 
   public server = () => {
     this.app.listen(process.env.APP_PORT, () => {
-      console.log("Server up and RUnning in Port 3333");
+      console.log("Server up and Running in Port 3333");
     });
   };
 
@@ -41,5 +43,5 @@ export class App {
   }
 }
 
-const app = new App([...studentRoute]);
+const app = new App([...studentRoute, ...schoolCodeRoute]);
 app.server();
