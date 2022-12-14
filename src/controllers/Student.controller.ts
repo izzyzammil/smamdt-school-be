@@ -1,7 +1,7 @@
-import { CreateStudentDto, UpdateStudentDto } from "@/dtos";
-import { StudentService } from "@/services";
-import { Response, NextFunction, Request } from "express";
-import path from "path";
+import { CreateStudentDto, UpdateStudentDto } from '@/dtos';
+import { StudentService } from '@/services';
+import { Response, NextFunction, Request } from 'express';
+import path from 'path';
 
 export class StudentController {
   public studentService = new StudentService();
@@ -10,7 +10,7 @@ export class StudentController {
     try {
       const result = await this.studentService.getStudent();
 
-      res.status(200).json({ message: "Ok", data: result });
+      res.status(200).json({ message: 'Ok', data: result });
     } catch (error) {
       next(error);
     }
@@ -21,7 +21,7 @@ export class StudentController {
       const { nisn } = req.params;
       const result = await this.studentService.getStudentById(nisn);
 
-      res.status(200).json({ message: "Success Get Student by NISN", data: result });
+      res.status(200).json({ message: 'Success Get Student by NISN', data: result });
     } catch (error) {
       next(error);
     }
@@ -32,7 +32,7 @@ export class StudentController {
       const args: CreateStudentDto = req.body;
 
       const result = await this.studentService.createStudent(args, req.file);
-      res.status(201).json({ message: "Success Create Student", data: result });
+      res.status(201).json({ message: 'Success Create Student', data: result });
     } catch (error) {
       next(error);
     }
@@ -42,9 +42,9 @@ export class StudentController {
     try {
       const { nisn } = req.params;
       const args: UpdateStudentDto = req.body;
-      const result = await this.studentService.updateStudent(nisn, args);
+      const result = await this.studentService.updateStudent(nisn, args, req.file);
 
-      res.status(200).json({ message: "Success Update Student", data: result });
+      res.status(200).json({ message: 'Success Update Student', data: result });
     } catch (error) {
       next(error);
     }
@@ -55,7 +55,7 @@ export class StudentController {
       const { nisn } = req.params;
       const result = await this.studentService.deleteStudent(nisn);
 
-      res.status(200).json({ message: "Success Delete Student", data: result });
+      res.status(200).json({ message: 'Success Delete Student', data: result });
     } catch (error) {
       next(error);
     }

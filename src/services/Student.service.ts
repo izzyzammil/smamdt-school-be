@@ -65,7 +65,18 @@ export class StudentService {
     return { student, user };
   };
 
-  public updateStudent = async (nisn: string, args: UpdateStudentDto) => {
+  public updateStudent = async (nisn: string, args: UpdateStudentDto, file?: any) => {
+    const checkStudent = await prisma.student.findUnique({ where: { nisn } });
+    if (!checkStudent) throw new HttpException(404, 'Data Siswa tidak ditemukan');
+
+    const checkRegId = await prisma.student.findFirst({
+      where: { registrationId: args.registrationId, nisn: { not: nisn } },
+    });
+    if (checkRegId) throw new HttpException(400, 'Something Wrong', { registrationId: ['Nomor Induk sudah dipakai'] });
+
+    const filePath = file?.path ? file.path : checkStudent.studentFile;
+    const fileName = file?.filename ? `${API_URL}/student-file/${file.filename}` : checkStudent.studentUrl;
+
     const { birthDate, dateOfEntry, ...studentArgs } = args;
     const student = await prisma.student.update({
       where: { nisn },
@@ -73,6 +84,8 @@ export class StudentService {
         ...studentArgs,
         birthDate: new Date(args.birthDate),
         dateOfEntry: new Date(args.dateOfEntry),
+        studentFile: filePath,
+        studentUrl: fileName,
       },
     });
 

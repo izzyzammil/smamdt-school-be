@@ -25,7 +25,12 @@ export class StudentRoute implements Routes {
       validationMiddleware(CreateStudentDto, 'body'),
       this.studentController.createStudent,
     );
-    this.router.put(`${this.path}/update`, validationMiddleware(UpdateStudentDto, 'body'), this.studentController.updateStudent);
+    this.router.put(
+      `${this.path}/update`,
+      this.uploadStudentFile,
+      validationMiddleware(UpdateStudentDto, 'body'),
+      this.studentController.updateStudent,
+    );
     this.router.delete(`${this.path}/delete`, this.studentController.deleteStudent);
     this.router.get('/student-file/:fileName', this.studentController.getStudentFile);
   }
