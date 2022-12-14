@@ -4,6 +4,7 @@ import { HttpException } from '@/exceptions/HttpException';
 import { prisma } from '@/libs/prisma';
 import { SchoolCodeService } from './SchoolCode.service';
 import { MyBcrypt } from '@/utils/my-bcrypt';
+import fs from 'fs';
 
 export class StudentService {
   public schoolCodeService = new SchoolCodeService();
@@ -93,9 +94,19 @@ export class StudentService {
   };
 
   public deleteStudent = async (nisn: string) => {
-    const student = await prisma.student.delete({
-      where: { nisn },
-    });
+    const checkStudent = await prisma.student.findUnique({ where: { nisn } });
+    if (!checkStudent) throw new HttpException(404, 'Data Siswa tidak ditemukan');
+
+    const filepath = `./${checkStudent.studentFile}`;
+    if (fs.existsSync(filepath)) {
+      try {
+        fs.unlinkSync(filepath);
+      } catch (error) {
+        console.log(`Delete image failed ${filepath}`);
+      }
+    }
+
+    const student = await prisma.student.delete({ where: { nisn } });
 
     return student;
   };
