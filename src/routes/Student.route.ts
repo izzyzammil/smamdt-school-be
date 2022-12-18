@@ -18,7 +18,7 @@ export class StudentRoute implements Routes {
 
   private initializeRoutes() {
     this.router.get(`${this.path}/list`, this.studentController.getStudent);
-    this.router.get(`${this.path}/detail`, this.studentController.getStudentById);
+    this.router.get(`${this.path}/:nisn`, this.studentController.getStudentById);
     this.router.post(
       `${this.path}/create`,
       this.uploadStudentFile,
@@ -26,12 +26,12 @@ export class StudentRoute implements Routes {
       this.studentController.createStudent,
     );
     this.router.put(
-      `${this.path}/update`,
+      `${this.path}/:nisn`,
       this.uploadStudentFile,
       validationMiddleware(UpdateStudentDto, 'body'),
       this.studentController.updateStudent,
     );
-    this.router.delete(`${this.path}/delete`, this.studentController.deleteStudent);
+    this.router.delete(`${this.path}/:nisn`, this.studentController.deleteStudent);
     this.router.get('/student-file/:fileName', this.studentController.getStudentFile);
   }
 }
