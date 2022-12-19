@@ -19,7 +19,7 @@ export class AdminService {
       select: { name: true },
     });
 
-    if (checkAcc) throw new HttpException(400, 'Something Wrong', { name: ['Username sudah ada'] });
+    if (checkAcc) throw new HttpException(400, 'Something Wrong', { name: ['Username sudah terdaftar'] });
 
     const { finalId } = await this.schoolCodeService.genSchoolId('U-');
 

@@ -1,4 +1,4 @@
-import { CreateAdminDto } from './../dtos/admin.dto';
+import { CreateAdminDto, UpdateAdminDto } from './../dtos/admin.dto';
 import { validationMiddleware } from '@/middlewares';
 import { AdminController } from './../controllers/Admin.controller';
 import { Routes } from '@/interfaces';
@@ -16,5 +16,6 @@ export class AdminRoute implements Routes {
   private initializeRoutes() {
     this.router.get(`${this.path}/list`, this.adminController.getAdmins);
     this.router.post(`${this.path}/create`, validationMiddleware(CreateAdminDto, 'body'), this.adminController.createAdmin);
+    // this.router.put(`${this.path}/:id`, validationMiddleware(UpdateAdminDto, 'body'), this.adminController.updateStudent);
   }
 }
