@@ -1,4 +1,6 @@
 import { CreateAdminDto, UpdateAdminDto } from './../dtos/admin.dto';
+
+import { CreateAdminDto } from './../dtos/admin.dto';
 import { validationMiddleware } from '@/middlewares';
 import { AdminController } from './../controllers/Admin.controller';
 import { Routes } from '@/interfaces';

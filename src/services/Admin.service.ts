@@ -20,7 +20,6 @@ export class AdminService {
     });
 
     if (checkAcc) throw new HttpException(400, 'Something Wrong', { name: ['Username sudah terdaftar'] });
-
     const { finalId } = await this.schoolCodeService.genSchoolId('U-');
 
     const hashedPassword = await MyBcrypt.encrypt('123456');
