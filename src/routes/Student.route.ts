@@ -5,6 +5,7 @@ import { CreateStudentDto, UpdateStudentDto } from '@/dtos';
 import multer from 'multer';
 import { multerStudentConfig } from '@/config/multer';
 import { validationMiddleware } from '@/middlewares';
+import authMiddleware from '@/middlewares/auth.middleware';
 
 export class StudentRoute implements Routes {
   public path = '/v1/students';
@@ -21,17 +22,19 @@ export class StudentRoute implements Routes {
     this.router.get(`${this.path}/:nisn`, this.studentController.getStudentById);
     this.router.post(
       `${this.path}/create`,
+      authMiddleware,
       this.uploadStudentFile,
       validationMiddleware(CreateStudentDto, 'body'),
       this.studentController.createStudent,
     );
     this.router.put(
       `${this.path}/:nisn`,
+      authMiddleware,
       this.uploadStudentFile,
       validationMiddleware(UpdateStudentDto, 'body'),
       this.studentController.updateStudent,
     );
-    this.router.delete(`${this.path}/:nisn`, this.studentController.deleteStudent);
-    this.router.get('/student-file/:fileName', this.studentController.getStudentFile);
+    this.router.delete(`${this.path}/:nisn`, authMiddleware, this.studentController.deleteStudent);
+    this.router.get('/student-file/:fileName', authMiddleware, this.studentController.getStudentFile);
   }
 }

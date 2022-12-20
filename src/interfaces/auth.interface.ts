@@ -13,5 +13,5 @@ export interface TokenData {
 }
 
 export interface RequestWithUser extends Request {
-  auth: AuthDataStoredInToken;
+  user?: AuthDataStoredInToken;
 }

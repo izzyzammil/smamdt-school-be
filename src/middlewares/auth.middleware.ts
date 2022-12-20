@@ -20,7 +20,7 @@ const authMiddleware = async (req: RequestWithUser, res: Response, next: NextFun
       });
 
       if (findUser) {
-        req.auth = findUser;
+        req.user = findUser;
         next();
       } else {
         next(new HttpException(401, 'Wrong authentication token'));
