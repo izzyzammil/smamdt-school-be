@@ -24,23 +24,23 @@ export class StudentService {
   };
 
   public createStudent = async (args: CreateStudentDto, file?: any) => {
+    const { finalId: userId } = await this.schoolCodeService.genSchoolId('U-');
+    const { finalId: studentId } = await this.schoolCodeService.genSchoolId('S-');
+
     const checkNisn = await prisma.student.findFirst({
-      where: { nisn: args.nisn },
+      where: { nisn: args.nisn, id: { not: userId } },
       select: { nisn: true },
     });
     if (checkNisn) throw new HttpException(400, 'Something Wrong', { nisn: ['Nisn sudah dipakai'] });
 
     const checkRegId = await prisma.student.findFirst({
-      where: { registrationId: args.registrationId, nisn: { not: args.nisn } },
+      where: { registrationId: args.registrationId, id: { not: userId } },
       select: { nisn: true },
     });
     if (checkRegId) throw new HttpException(400, 'Something Wrong', { registrationId: ['Nomor Induk sudah dipakai'] });
 
     const filePath = file?.path ? file.path : null;
     const fileName = file?.filename ? `${API_URL}/student-file/${file.filename}` : null;
-
-    const { finalId: userId } = await this.schoolCodeService.genSchoolId('U-');
-    const { finalId: studentId } = await this.schoolCodeService.genSchoolId('S-');
 
     const hashedPassword = await MyBcrypt.encrypt(args.motherName);
     const { birthDate, dateOfEntry, ...studentArgs } = args;
@@ -75,13 +75,13 @@ export class StudentService {
     if (!checkStudent) throw new HttpException(404, 'Data Siswa tidak ditemukan');
 
     const checkNisn = await prisma.student.findFirst({
-      where: { nisn: args.nisn },
+      where: { nisn: args.nisn, id: { not: id } },
       select: { nisn: true },
     });
     if (checkNisn) throw new HttpException(400, 'Something Wrong', { nisn: ['Nisn sudah dipakai'] });
 
     const checkRegId = await prisma.student.findFirst({
-      where: { registrationId: args.registrationId, nisn: { not: id } },
+      where: { registrationId: args.registrationId, id: { not: id } },
     });
     if (checkRegId) throw new HttpException(400, 'Something Wrong', { registrationId: ['Nomor Induk sudah dipakai'] });
 
