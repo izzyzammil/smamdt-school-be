@@ -8,6 +8,7 @@ import { Routes } from './interfaces';
 import { APP_PORT, CREDENTIALS } from '@/config';
 import { errorMiddleware } from './middlewares';
 import dotenv from 'dotenv';
+
 dotenv.config();
 
 const authRoute = [new AuthRoute()];
@@ -49,5 +50,7 @@ export class App {
   }
 }
 
+
 const app = new App([...authRoute, ...studentRoute, ...schoolCodeRoute, ...adminRoute]);
+
 app.server();

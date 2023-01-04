@@ -1,4 +1,4 @@
-import { CreateAdminDto } from './../dtos/admin.dto';
+import { CreateAdminDto, UpdateAdminDto } from './../dtos/admin.dto';
 import { AdminService } from '@/services';
 import { Request, Response, NextFunction } from 'express';
 
@@ -25,4 +25,17 @@ export class AdminController {
       next(error);
     }
   };
+
+  public updateAdmin = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.params;
+      const args: UpdateAdminDto = req.body;
+      const result = await this.adminService.updateStudent(id, args);
+
+      res.status(200).json({ message: 'Success Update Admin', data: result });
+    } catch (error) {
+      next(error);
+    }
+  };
+
 }

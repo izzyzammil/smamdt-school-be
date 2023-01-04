@@ -14,6 +14,12 @@ export class AdminService {
   };
 
   public createAdmin = async (args: CreateAdminDto) => {
+    const checkAcc = await prisma.admin.findFirst({
+      where: { name: args.name },
+      select: { name: true },
+    });
+
+    if (checkAcc) throw new HttpException(400, 'Something Wrong', { name: ['Username sudah terdaftar'] });
     const { finalId } = await this.schoolCodeService.genSchoolId('U-');
 
     const hashedPassword = await MyBcrypt.encrypt('123456');
