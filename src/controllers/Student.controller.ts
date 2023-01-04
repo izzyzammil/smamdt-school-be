@@ -18,10 +18,10 @@ export class StudentController {
 
   public getStudentById = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { nisn } = req.params;
-      const result = await this.studentService.getStudentById(nisn);
+      const { id } = req.params;
+      const result = await this.studentService.getStudentById(id);
 
-      res.status(200).json({ message: 'Success Get Student by NISN', data: result });
+      res.status(200).json({ message: 'Success Get Student by Id', data: result });
     } catch (error) {
       next(error);
     }
@@ -40,9 +40,9 @@ export class StudentController {
 
   public updateStudent = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { nisn } = req.params;
+      const { id } = req.params;
       const args: UpdateStudentDto = req.body;
-      const result = await this.studentService.updateStudent(nisn, args, req.file);
+      const result = await this.studentService.updateStudent(id, args, req.file);
 
       res.status(200).json({ message: 'Success Update Student', data: result });
     } catch (error) {
@@ -52,8 +52,8 @@ export class StudentController {
 
   public deleteStudent = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { nisn } = req.params;
-      const result = await this.studentService.deleteStudent(nisn);
+      const { id } = req.params;
+      const result = await this.studentService.deleteStudent(id);
 
       res.status(200).json({ message: 'Success Delete Student', data: result });
     } catch (error) {

@@ -27,6 +27,9 @@ export class SchoolCodeService {
       case 'U-':
         check = await prisma.user.findUnique({ where: { id: finalId }, select: { id: true } });
         break;
+      case 'S-':
+        check = await prisma.user.findUnique({ where: { id: finalId }, select: { id: true } });
+        break;
       case 'G-':
         check = await prisma.teacher.findUnique({ where: { id: finalId }, select: { id: true } });
         break;

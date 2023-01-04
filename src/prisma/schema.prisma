@@ -39,7 +39,8 @@ model Admin {
 }
 
 model Student {
-  nisn           String        @id @map("nisn")
+  id             String        @id @map("id")
+  nisn           String        @map("nisn")
   userId         String        @map("userId")
   registrationId String        @map("registration_id")
   name           String        @map("name")
@@ -64,7 +65,7 @@ model Student {
 
   User User @relation(fields: [userId], references: [id])
 
-  @@unique([registrationId])
+  @@unique([registrationId, nisn])
   @@map("students")
 }
 
@@ -116,12 +117,13 @@ model Classroom {
 
 model ClassroomMember {
   classroomId String   @id @map("classroom_id")
+  studentId   String   @map("student_id")
   nisn        String   @map("nisn")
   studentName String   @map("student_name")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
 
-  Student Student @relation(fields: [nisn], references: [nisn])
+  Student Student @relation(fields: [studentId], references: [id])
 
   @@map("classroom_members")
 }
@@ -166,13 +168,14 @@ model LessonSchedule {
 model StudentsPass {
   id            Int           @id @default(autoincrement())
   studentId     String        @map("student_id")
+  nisn          String        @map("nisn")
   studentName   String        @map("student_name")
   outDate       DateTime      @map("out_date") @db.Date
   reasonToLeave ReasonToLeave @default(Lulus) @map("reason_to_leave")
   createdAt     DateTime      @default(now()) @map("created_at")
   updatedAt     DateTime      @default(now()) @updatedAt @map("updated_at")
 
-  Student Student @relation(fields: [studentId], references: [nisn])
+  Student Student @relation(fields: [studentId], references: [id])
 
   @@unique([studentId])
   @@map("students_pass")
@@ -181,6 +184,7 @@ model StudentsPass {
 model Alumni {
   id             Int       @id @default(autoincrement())
   studentId      String    @map("student_id")
+  nisn           String    @map("nisn")
   studentName    String    @map("student_name")
   gender         Gender    @default(Laki_laki) @map("gender")
   placeOfBirth   String?   @map("place_of_birth")
@@ -195,7 +199,7 @@ model Alumni {
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @default(now()) @updatedAt @map("updated_at")
 
-  Student Student @relation(fields: [studentId], references: [nisn])
+  Student Student @relation(fields: [studentId], references: [id])
 
   @@unique([studentId])
   @@map("alumnis")
@@ -218,12 +222,13 @@ model Extracurricular {
 
 model ExtracurricularMember {
   extracurricularId String   @id @map("extracurricular_id")
+  studentId         String   @map("student_id")
   nisn              String   @map("nisn")
   studentName       String   @map("student_name")
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @default(now()) @updatedAt @map("updated_at")
 
-  Student Student @relation(fields: [nisn], references: [nisn])
+  Student Student @relation(fields: [studentId], references: [id])
 
   @@map("extracurricular_members")
 }

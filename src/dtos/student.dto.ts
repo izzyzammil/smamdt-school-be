@@ -48,6 +48,11 @@ export class CreateStudentDto extends StudentDto {
 }
 
 export class UpdateStudentDto extends StudentDto {
+  @IsNotEmpty({ message: 'Nisn tidak boleh kosong' })
+  @IsNumberString('', { message: 'Nisn harus angka' })
+  @MinLength(10, { message: 'Nisn harus 10 digit' })
+  nisn!: string;
+
   @IsOptional()
   @IsNumberString()
   registrationId?: string;
