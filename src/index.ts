@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
-import { StudentRoute, AdminRoute, SchoolCodeRoute, AuthRoute } from '@/routes';
+import { StudentRoute, AdminRoute, SchoolCodeRoute, AuthRoute, TeacherRoute } from '@/routes';
 import { Routes } from './interfaces';
 import { APP_PORT, CREDENTIALS } from '@/config';
 import { errorMiddleware } from './middlewares';
@@ -11,9 +11,11 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const authRoute = [new AuthRoute()];
-const studentRoute = [new StudentRoute()];
 const schoolCodeRoute = [new SchoolCodeRoute()];
 const adminRoute = [new AdminRoute()];
+const studentRoute = [new StudentRoute()];
+const teacherRoute = [new TeacherRoute()];
+
 export class App {
   public app: express.Application;
 
@@ -49,5 +51,5 @@ export class App {
   }
 }
 
-const app = new App([...authRoute, ...studentRoute, ...schoolCodeRoute, ...adminRoute]);
+const app = new App([...authRoute, ...schoolCodeRoute, ...adminRoute, ...studentRoute, ...teacherRoute]);
 app.server();
