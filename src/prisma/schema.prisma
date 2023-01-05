@@ -6,62 +6,93 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model Admin {
-  username  String   @id @map("username")
+model User {
+  id        String   @id @map("id")
+  username  String   @map("username")
   password  String   @map("password")
+  role      Roles    @map("role")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  Admin   Admin[]
+  Student Student[]
+  Teacher Teacher[]
+
+  @@unique([username])
+  @@map("users")
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement()) @map("username")
+  name      String   @map("name")
+  userId    String   @map("userId")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  User User @relation(fields: [userId], references: [id])
 
   @@map("admins")
 }
 
 model Student {
-  nisn           String   @id @map("nisn")
-  registrationId String   @map("registration_id")
-  name           String   @map("name")
-  placeOfBirth   String   @map("place_of_birth")
-  birthDate      DateTime @map("birth_date") @db.Date
-  address        String?  @map("address")
-  motherName     String   @map("mother_name")
-  fatherName     String?  @map("father_name")
-  gender         Gender   @default(Laki_laki) @map("gender")
-  email          String?  @map("email")
-  dateOfEntry    DateTime @map("date_of_entry") @db.Date
-  status         Status   @default(Siswa_Baru) @map("status")
-  isActive       Boolean  @default(true) @map("is_active")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @default(now()) @updatedAt @map("updated_at")
+  id             String        @id @map("id")
+  nisn           String        @map("nisn")
+  userId         String        @map("userId")
+  registrationId String        @map("registration_id")
+  name           String        @map("name")
+  gender         Gender        @default(Laki_laki) @map("gender")
+  placeOfBirth   String        @map("place_of_birth")
+  birthDate      DateTime      @map("birth_date") @db.Date
+  address        String?       @map("address")
+  motherName     String        @map("mother_name")
+  fatherName     String?       @map("father_name")
+  email          String?       @map("email")
+  dateOfEntry    DateTime      @map("date_of_entry") @db.Date
+  status         StudentStatus @default(Siswa_Baru) @map("status")
+  studentFile    String?       @map("file")
+  studentUrl     String?       @map("url")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @default(now()) @updatedAt @map("updated_at")
 
   StudentsPass          StudentsPass[]
   Alumni                Alumni[]
   ClassroomList         ClassroomMember[]
   ExtracurricularMember ExtracurricularMember[]
 
-  @@unique([registrationId])
+  User User @relation(fields: [userId], references: [id])
+
+  @@unique([registrationId, nisn])
   @@map("students")
 }
 
 model Teacher {
-  id           String   @id @map("id")
-  name         String   @map("name")
-  placeOfBirth String   @map("place_of_birth")
-  birthDate    DateTime @map("birth_date") @db.Date
-  address      String?  @map("address")
-  nik          String?  @map("nik")
-  nuptk        String?  @map("nuptk")
-  nip          String?  @map("nip")
-  email        String?  @map("email")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+  id           String        @id @map("id")
+  name         String        @map("name")
+  userId       String        @map("userId")
+  gender       Gender        @default(Laki_laki) @map("gender")
+  placeOfBirth String        @map("place_of_birth")
+  birthDate    DateTime      @map("birth_date") @db.Date
+  address      String?       @map("address")
+  nik          String?       @map("nik")
+  nuptk        String?       @map("nuptk")
+  nip          String?       @map("nip")
+  email        String?       @map("email")
+  status       TeacherStatus @default(Aktif) @map("status")
+  teacherFile  String?       @map("file")
+  teacherUrl   String?       @map("url")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @default(now()) @updatedAt @map("updated_at")
 
   Classroom       Classroom[]
   Learning        Learning[]
   LessonSchedule  LessonSchedule[]
   extracurricular Extracurricular[]
+
+  User User @relation(fields: [userId], references: [id])
 
   @@unique([nuptk])
   @@map("teachers")
@@ -86,12 +117,13 @@ model Classroom {
 
 model ClassroomMember {
   classroomId String   @id @map("classroom_id")
+  studentId   String   @map("student_id")
   nisn        String   @map("nisn")
   studentName String   @map("student_name")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
 
-  Student Student @relation(fields: [nisn], references: [nisn])
+  Student Student @relation(fields: [studentId], references: [id])
 
   @@map("classroom_members")
 }
@@ -136,13 +168,14 @@ model LessonSchedule {
 model StudentsPass {
   id            Int           @id @default(autoincrement())
   studentId     String        @map("student_id")
+  nisn          String        @map("nisn")
   studentName   String        @map("student_name")
   outDate       DateTime      @map("out_date") @db.Date
   reasonToLeave ReasonToLeave @default(Lulus) @map("reason_to_leave")
   createdAt     DateTime      @default(now()) @map("created_at")
   updatedAt     DateTime      @default(now()) @updatedAt @map("updated_at")
 
-  Student Student @relation(fields: [studentId], references: [nisn])
+  Student Student @relation(fields: [studentId], references: [id])
 
   @@unique([studentId])
   @@map("students_pass")
@@ -151,6 +184,7 @@ model StudentsPass {
 model Alumni {
   id             Int       @id @default(autoincrement())
   studentId      String    @map("student_id")
+  nisn           String    @map("nisn")
   studentName    String    @map("student_name")
   gender         Gender    @default(Laki_laki) @map("gender")
   placeOfBirth   String?   @map("place_of_birth")
@@ -165,7 +199,7 @@ model Alumni {
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @default(now()) @updatedAt @map("updated_at")
 
-  Student Student @relation(fields: [studentId], references: [nisn])
+  Student Student @relation(fields: [studentId], references: [id])
 
   @@unique([studentId])
   @@map("alumnis")
@@ -188,21 +222,24 @@ model Extracurricular {
 
 model ExtracurricularMember {
   extracurricularId String   @id @map("extracurricular_id")
+  studentId         String   @map("student_id")
   nisn              String   @map("nisn")
   studentName       String   @map("student_name")
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @default(now()) @updatedAt @map("updated_at")
 
-  Student Student @relation(fields: [nisn], references: [nisn])
+  Student Student @relation(fields: [studentId], references: [id])
 
   @@map("extracurricular_members")
 }
 
 model SchoolCode {
-  headerCode String   @id @map("header_code")
-  name       String   @map("name")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
+  headerCode    String   @id @map("header_code")
+  name          String   @map("name")
+  counterLength Int      @default(1) @map("counter_length")
+  nextCounter   Int      @map("next_counter")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("school_code")
 }
@@ -212,9 +249,19 @@ enum Gender {
   Perempuan
 }
 
-enum Status {
+enum StudentStatus {
   Siswa_Baru
   Pindahan
+  Lulus
+  Tidak_Lulus
+  Berhenti
+}
+
+enum TeacherStatus {
+  Aktif
+  Cuti
+  Mutasi
+  Berhenti
 }
 
 enum Program {
@@ -230,4 +277,10 @@ enum ReasonToLeave {
   Berhenti_Sekolah
   Pindah_Sekolah
   Lainnya
+}
+
+enum Roles {
+  Admin
+  Student
+  Teacher
 }
