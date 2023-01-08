@@ -143,6 +143,9 @@ export class TeacherService {
     const checkTeacher = await prisma.teacher.findUnique({ where: { id } });
     if (!checkTeacher) throw new HttpException(404, 'Data Guru tidak ditemukan');
 
+    const checkUser = await prisma.user.findUnique({ where: { id: checkTeacher.userId } });
+    if (!checkUser) throw new HttpException(404, 'Data User tidak ditemukan');
+
     const filepath = `./${checkTeacher.teacherFile}`;
     if (fs.existsSync(filepath)) {
       try {
@@ -152,7 +155,10 @@ export class TeacherService {
       }
     }
 
+    // ----- Delete Teacher in table teacher -----
     const teacher = await prisma.teacher.delete({ where: { id } });
+    // ----- Delete User from Teacher in table User -----
+    await prisma.user.delete({ where: { id: checkUser.id } });
 
     return teacher;
   };
