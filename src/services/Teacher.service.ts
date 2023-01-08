@@ -56,7 +56,7 @@ export class TeacherService {
 
     const hashedPassword = await MyBcrypt.encrypt('smamdt123');
     const firstUsername = args.name.replace(' ', '').toLowerCase();
-    const lastUsername = userId.replace('G-', '');
+    const lastUsername = teacherId.replace('G-', '');
     const { birthDate, ...teacherArgs } = args;
 
     const user = await prisma.user.create({
@@ -87,7 +87,7 @@ export class TeacherService {
     const checkTeacher = await prisma.teacher.findUnique({ where: { id } });
     if (!checkTeacher) throw new HttpException(404, 'Data Guru tidak ditemukan');
 
-    if (args.nik) {
+    if (args.nik && args.nik !== checkTeacher.nik) {
       const checkNik = await prisma.teacher.findFirst({
         where: { nik: args.nik, id: { not: id } },
         select: { id: true },
@@ -95,7 +95,7 @@ export class TeacherService {
       if (checkNik) throw new HttpException(400, 'Something Wrong', { nik: ['NIK sudah dipakai'] });
     }
 
-    if (args.nuptk) {
+    if (args.nuptk && args.nuptk !== checkTeacher.nuptk) {
       const checkNuptk = await prisma.teacher.findFirst({
         where: { nuptk: args.nuptk, id: { not: id } },
         select: { id: true },
@@ -103,12 +103,23 @@ export class TeacherService {
       if (checkNuptk) throw new HttpException(400, 'Something Wrong', { nuptk: ['NUPTK sudah dipakai'] });
     }
 
-    if (args.nip) {
+    if (args.nip && args.nip !== checkTeacher.nip) {
       const checkNip = await prisma.teacher.findFirst({
         where: { nip: args.nip, id: { not: id } },
         select: { id: true },
       });
       if (checkNip) throw new HttpException(400, 'Something Wrong', { nip: ['NIP sudah dipakai'] });
+    }
+
+    // ----- Update username in table user when name is changed -----
+    if (args.name && args.name !== checkTeacher.name) {
+      const firstUsername = args.name.replace(' ', '').toLowerCase();
+      const lastUsername = checkTeacher.id.replace('G-', '');
+
+      await prisma.user.update({
+        where: { id: checkTeacher.userId },
+        data: { username: `${firstUsername}${lastUsername}` },
+      });
     }
 
     const filePath = file?.path ? file.path : checkTeacher.teacherFile;
