@@ -75,16 +75,32 @@ export class StudentService {
     const checkStudent = await prisma.student.findUnique({ where: { id } });
     if (!checkStudent) throw new HttpException(404, 'Data Siswa tidak ditemukan');
 
-    const checkNisn = await prisma.student.findFirst({
-      where: { nisn: args.nisn, id: { not: id } },
-      select: { nisn: true },
-    });
-    if (checkNisn) throw new HttpException(400, 'Something Wrong', { nisn: ['Nisn sudah dipakai'] });
+    if (args.nisn && args.nisn !== checkStudent.nisn) {
+      const checkNisn = await prisma.student.findFirst({
+        where: { nisn: args.nisn, id: { not: id } },
+        select: { nisn: true },
+      });
+      if (checkNisn) throw new HttpException(400, 'Something Wrong', { nisn: ['Nisn sudah dipakai'] });
+    }
 
-    const checkRegId = await prisma.student.findFirst({
-      where: { registrationId: args.registrationId, id: { not: id } },
-    });
-    if (checkRegId) throw new HttpException(400, 'Something Wrong', { registrationId: ['Nomor Induk sudah dipakai'] });
+    if (args.registrationId && args.registrationId !== checkStudent.registrationId) {
+      const checkRegId = await prisma.student.findFirst({
+        where: { registrationId: args.registrationId, id: { not: id } },
+      });
+      if (checkRegId) throw new HttpException(400, 'Something Wrong', { registrationId: ['Nomor Induk sudah dipakai'] });
+    }
+
+    // ----- Update username in table user when name or registrationId is changed -----
+    if ((args.registrationId && args.registrationId !== checkStudent.registrationId) || (args.name && args.name !== checkStudent.name)) {
+      const firstUsername = args.name.replace(' ', '').toLowerCase();
+
+      await prisma.user.update({
+        where: { id: checkStudent.userId },
+        data: {
+          username: `${firstUsername}${args.registrationId}`,
+        },
+      });
+    }
 
     const filePath = file?.path ? file.path : checkStudent.studentFile;
     const fileName = file?.filename ? `${API_URL}/student-file/${file.filename}` : checkStudent.studentUrl;
@@ -120,9 +136,9 @@ export class StudentService {
       }
     }
 
-    // ----- Delete Student in table student
+    // ----- Delete Student in table student -----
     const student = await prisma.student.delete({ where: { id } });
-    // ----- Delete User from Student in table User
+    // ----- Delete User from Student in table User -----
     await prisma.user.delete({ where: { id: checkUser.id } });
 
     return student;
