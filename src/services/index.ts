@@ -3,3 +3,4 @@ export * from './SchoolCode.service';
 export * from './Admin.service';
 export * from './Auth.service';
 export * from './Teacher.service';
+export * from './Classroom.service';

@@ -6,13 +6,13 @@ import { SchoolCodeService } from './SchoolCode.service';
 import { MyBcrypt } from '@/utils/my-bcrypt';
 import fs from 'fs';
 
-export class StudentService {
+export class ClassroomService {
   public schoolCodeService = new SchoolCodeService();
 
-  public getStudents = async () => {
-    const students = await prisma.student.findMany({ orderBy: { registrationId: 'asc' } });
+  public getStudent = async () => {
+    const student = await prisma.student.findMany({ orderBy: { registrationId: 'asc' } });
 
-    return students;
+    return student;
   };
 
   public getStudentById = async (id: string) => {
@@ -107,9 +107,6 @@ export class StudentService {
     const checkStudent = await prisma.student.findUnique({ where: { id } });
     if (!checkStudent) throw new HttpException(404, 'Data Siswa tidak ditemukan');
 
-    const checkUser = await prisma.user.findUnique({ where: { id: checkStudent.userId } });
-    if (!checkUser) throw new HttpException(404, 'Data User tidak ditemukan');
-
     const filepath = `./${checkStudent.studentFile}`;
     if (fs.existsSync(filepath)) {
       try {
@@ -119,10 +116,7 @@ export class StudentService {
       }
     }
 
-    // ----- Delete Student in table student
     const student = await prisma.student.delete({ where: { id } });
-    // ----- Delete User from Student in table User
-    await prisma.user.delete({ where: { id: checkUser.id } });
 
     return student;
   };

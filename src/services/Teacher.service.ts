@@ -9,10 +9,10 @@ import { CreateTeacherDto, UpdateTeacherDto } from '@/dtos/teacher.dto';
 export class TeacherService {
   public schoolCodeService = new SchoolCodeService();
 
-  public getTeacher = async () => {
-    const teacher = await prisma.teacher.findMany({ orderBy: { id: 'asc' } });
+  public getTeachers = async () => {
+    const teachers = await prisma.teacher.findMany({ orderBy: { id: 'asc' } });
 
-    return teacher;
+    return teachers;
   };
 
   public getTeacherById = async (id: string) => {

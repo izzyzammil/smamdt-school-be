@@ -6,9 +6,9 @@ import path from 'path';
 export class StudentController {
   public studentService = new StudentService();
 
-  public getStudent = async (req: Request, res: Response, next: NextFunction) => {
+  public getStudents = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await this.studentService.getStudent();
+      const result = await this.studentService.getStudents();
 
       res.status(200).json({ message: 'Ok', data: result });
     } catch (error) {
