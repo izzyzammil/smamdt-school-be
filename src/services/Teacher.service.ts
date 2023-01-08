@@ -9,10 +9,10 @@ import { CreateTeacherDto, UpdateTeacherDto } from '@/dtos/teacher.dto';
 export class TeacherService {
   public schoolCodeService = new SchoolCodeService();
 
-  public getTeacher = async () => {
-    const teacher = await prisma.teacher.findMany({ orderBy: { id: 'asc' } });
+  public getTeachers = async () => {
+    const teachers = await prisma.teacher.findMany({ orderBy: { id: 'asc' } });
 
-    return teacher;
+    return teachers;
   };
 
   public getTeacherById = async (id: string) => {
@@ -55,12 +55,14 @@ export class TeacherService {
     const fileName = file?.filename ? `${API_URL}/teacher-file/${file.filename}` : null;
 
     const hashedPassword = await MyBcrypt.encrypt('smamdt123');
+    const firstUsername = args.name.replace(' ', '').toLowerCase();
+    const lastUsername = teacherId.replace('G-', '');
     const { birthDate, ...teacherArgs } = args;
 
     const user = await prisma.user.create({
       data: {
         id: userId,
-        username: args.name,
+        username: `${firstUsername}${lastUsername}`,
         password: hashedPassword,
         role: 'Teacher',
       },
@@ -85,7 +87,7 @@ export class TeacherService {
     const checkTeacher = await prisma.teacher.findUnique({ where: { id } });
     if (!checkTeacher) throw new HttpException(404, 'Data Guru tidak ditemukan');
 
-    if (args.nik) {
+    if (args.nik && args.nik !== checkTeacher.nik) {
       const checkNik = await prisma.teacher.findFirst({
         where: { nik: args.nik, id: { not: id } },
         select: { id: true },
@@ -93,7 +95,7 @@ export class TeacherService {
       if (checkNik) throw new HttpException(400, 'Something Wrong', { nik: ['NIK sudah dipakai'] });
     }
 
-    if (args.nuptk) {
+    if (args.nuptk && args.nuptk !== checkTeacher.nuptk) {
       const checkNuptk = await prisma.teacher.findFirst({
         where: { nuptk: args.nuptk, id: { not: id } },
         select: { id: true },
@@ -101,12 +103,23 @@ export class TeacherService {
       if (checkNuptk) throw new HttpException(400, 'Something Wrong', { nuptk: ['NUPTK sudah dipakai'] });
     }
 
-    if (args.nip) {
+    if (args.nip && args.nip !== checkTeacher.nip) {
       const checkNip = await prisma.teacher.findFirst({
         where: { nip: args.nip, id: { not: id } },
         select: { id: true },
       });
       if (checkNip) throw new HttpException(400, 'Something Wrong', { nip: ['NIP sudah dipakai'] });
+    }
+
+    // ----- Update username in table user when name is changed -----
+    if (args.name && args.name !== checkTeacher.name) {
+      const firstUsername = args.name.replace(' ', '').toLowerCase();
+      const lastUsername = checkTeacher.id.replace('G-', '');
+
+      await prisma.user.update({
+        where: { id: checkTeacher.userId },
+        data: { username: `${firstUsername}${lastUsername}` },
+      });
     }
 
     const filePath = file?.path ? file.path : checkTeacher.teacherFile;
@@ -130,6 +143,9 @@ export class TeacherService {
     const checkTeacher = await prisma.teacher.findUnique({ where: { id } });
     if (!checkTeacher) throw new HttpException(404, 'Data Guru tidak ditemukan');
 
+    const checkUser = await prisma.user.findUnique({ where: { id: checkTeacher.userId } });
+    if (!checkUser) throw new HttpException(404, 'Data User tidak ditemukan');
+
     const filepath = `./${checkTeacher.teacherFile}`;
     if (fs.existsSync(filepath)) {
       try {
@@ -139,7 +155,10 @@ export class TeacherService {
       }
     }
 
+    // ----- Delete Teacher in table teacher -----
     const teacher = await prisma.teacher.delete({ where: { id } });
+    // ----- Delete User from Teacher in table User -----
+    await prisma.user.delete({ where: { id: checkUser.id } });
 
     return teacher;
   };

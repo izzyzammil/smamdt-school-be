@@ -6,9 +6,9 @@ import path from 'path';
 export class TeacherController {
   public teacherService = new TeacherService();
 
-  public getTeacher = async (req: Request, res: Response, next: NextFunction) => {
+  public getTeachers = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await this.teacherService.getTeacher();
+      const result = await this.teacherService.getTeachers();
 
       res.status(200).json({ message: 'Ok', data: result });
     } catch (error) {

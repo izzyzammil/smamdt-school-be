@@ -6,13 +6,13 @@ import { SchoolCodeService } from './SchoolCode.service';
 import { MyBcrypt } from '@/utils/my-bcrypt';
 import fs from 'fs';
 
-export class StudentService {
+export class ClassroomService {
   public schoolCodeService = new SchoolCodeService();
 
-  public getStudents = async () => {
-    const students = await prisma.student.findMany({ orderBy: { registrationId: 'asc' } });
+  public getStudent = async () => {
+    const student = await prisma.student.findMany({ orderBy: { registrationId: 'asc' } });
 
-    return students;
+    return student;
   };
 
   public getStudentById = async (id: string) => {
@@ -43,13 +43,12 @@ export class StudentService {
     const fileName = file?.filename ? `${API_URL}/student-file/${file.filename}` : null;
 
     const hashedPassword = await MyBcrypt.encrypt(args.motherName);
-    const firstUsername = args.name.replace(' ', '').toLowerCase();
     const { birthDate, dateOfEntry, ...studentArgs } = args;
 
     const user = await prisma.user.create({
       data: {
         id: userId,
-        username: `${firstUsername}${args.registrationId}`,
+        username: `${args.name}${args.registrationId}`,
         password: hashedPassword,
         role: 'Student',
       },
@@ -75,32 +74,16 @@ export class StudentService {
     const checkStudent = await prisma.student.findUnique({ where: { id } });
     if (!checkStudent) throw new HttpException(404, 'Data Siswa tidak ditemukan');
 
-    if (args.nisn && args.nisn !== checkStudent.nisn) {
-      const checkNisn = await prisma.student.findFirst({
-        where: { nisn: args.nisn, id: { not: id } },
-        select: { nisn: true },
-      });
-      if (checkNisn) throw new HttpException(400, 'Something Wrong', { nisn: ['Nisn sudah dipakai'] });
-    }
+    const checkNisn = await prisma.student.findFirst({
+      where: { nisn: args.nisn, id: { not: id } },
+      select: { nisn: true },
+    });
+    if (checkNisn) throw new HttpException(400, 'Something Wrong', { nisn: ['Nisn sudah dipakai'] });
 
-    if (args.registrationId && args.registrationId !== checkStudent.registrationId) {
-      const checkRegId = await prisma.student.findFirst({
-        where: { registrationId: args.registrationId, id: { not: id } },
-      });
-      if (checkRegId) throw new HttpException(400, 'Something Wrong', { registrationId: ['Nomor Induk sudah dipakai'] });
-    }
-
-    // ----- Update username in table user when name or registrationId is changed -----
-    if ((args.registrationId && args.registrationId !== checkStudent.registrationId) || (args.name && args.name !== checkStudent.name)) {
-      const firstUsername = args.name.replace(' ', '').toLowerCase();
-
-      await prisma.user.update({
-        where: { id: checkStudent.userId },
-        data: {
-          username: `${firstUsername}${args.registrationId}`,
-        },
-      });
-    }
+    const checkRegId = await prisma.student.findFirst({
+      where: { registrationId: args.registrationId, id: { not: id } },
+    });
+    if (checkRegId) throw new HttpException(400, 'Something Wrong', { registrationId: ['Nomor Induk sudah dipakai'] });
 
     const filePath = file?.path ? file.path : checkStudent.studentFile;
     const fileName = file?.filename ? `${API_URL}/student-file/${file.filename}` : checkStudent.studentUrl;
@@ -124,9 +107,6 @@ export class StudentService {
     const checkStudent = await prisma.student.findUnique({ where: { id } });
     if (!checkStudent) throw new HttpException(404, 'Data Siswa tidak ditemukan');
 
-    const checkUser = await prisma.user.findUnique({ where: { id: checkStudent.userId } });
-    if (!checkUser) throw new HttpException(404, 'Data User tidak ditemukan');
-
     const filepath = `./${checkStudent.studentFile}`;
     if (fs.existsSync(filepath)) {
       try {
@@ -136,10 +116,7 @@ export class StudentService {
       }
     }
 
-    // ----- Delete Student in table student -----
     const student = await prisma.student.delete({ where: { id } });
-    // ----- Delete User from Student in table User -----
-    await prisma.user.delete({ where: { id: checkUser.id } });
 
     return student;
   };

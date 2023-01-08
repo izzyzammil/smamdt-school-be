@@ -2,6 +2,15 @@ import { Gender, StudentStatus } from '@prisma/client';
 import { IsEnum, IsNotEmpty, IsNumberString, IsOptional, IsString, Length, Min, MinLength } from 'class-validator';
 
 export class StudentDto {
+  @IsNotEmpty({ message: 'Nisn tidak boleh kosong' })
+  @IsNumberString('', { message: 'Nisn harus angka' })
+  @MinLength(10, { message: 'Nisn harus 10 digit' })
+  nisn!: string;
+
+  @IsNotEmpty({ message: 'No Induk tidak boleh kosong' })
+  @IsNumberString()
+  registrationId!: string;
+
   @IsNotEmpty({ message: 'Nama tidak boleh kosong' })
   @IsString({ message: 'Nama harus huruf' })
   name!: string;
@@ -36,24 +45,6 @@ export class StudentDto {
   status!: StudentStatus;
 }
 
-export class CreateStudentDto extends StudentDto {
-  @IsNotEmpty({ message: 'Nisn tidak boleh kosong' })
-  @IsNumberString('', { message: 'Nisn harus angka' })
-  @MinLength(10, { message: 'Nisn harus 10 digit' })
-  nisn!: string;
+export class CreateStudentDto extends StudentDto {}
 
-  @IsNotEmpty({ message: 'No Induk tidak boleh kosong' })
-  @IsNumberString()
-  registrationId!: string;
-}
-
-export class UpdateStudentDto extends StudentDto {
-  @IsNotEmpty({ message: 'Nisn tidak boleh kosong' })
-  @IsNumberString('', { message: 'Nisn harus angka' })
-  @MinLength(10, { message: 'Nisn harus 10 digit' })
-  nisn!: string;
-
-  @IsOptional()
-  @IsNumberString()
-  registrationId?: string;
-}
+export class UpdateStudentDto extends StudentDto {}

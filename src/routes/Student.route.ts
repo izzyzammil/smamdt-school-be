@@ -18,7 +18,7 @@ export class StudentRoute implements Routes {
   }
 
   private initializeRoutes() {
-    this.router.get(`${this.path}/list`, this.studentController.getStudent);
+    this.router.get(`${this.path}/list`, this.studentController.getStudents);
     this.router.get(`${this.path}/:id`, this.studentController.getStudentById);
     this.router.post(
       `${this.path}/create`,
