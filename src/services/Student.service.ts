@@ -43,12 +43,13 @@ export class StudentService {
     const fileName = file?.filename ? `${API_URL}/student-file/${file.filename}` : null;
 
     const hashedPassword = await MyBcrypt.encrypt(args.motherName);
+    const firstUsername = args.name.replace(' ', '').toLowerCase();
     const { birthDate, dateOfEntry, ...studentArgs } = args;
 
     const user = await prisma.user.create({
       data: {
         id: userId,
-        username: `${args.name}${args.registrationId}`,
+        username: `${firstUsername}${args.registrationId}`,
         password: hashedPassword,
         role: 'Student',
       },
